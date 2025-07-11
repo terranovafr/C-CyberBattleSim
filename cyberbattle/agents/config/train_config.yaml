@@ -1,0 +1,53 @@
+# Configuration file related to the script train_agent.py, sample_agent.py, hyperopt_agent.py
+
+episode_iterations: 200 # cut-off considered regardless of K
+proportional_cutoff_coefficient: 1 # whether to use a cut-off proportional to the number of nodes (K) and of how much, or -1 if not
+winning_reward: 300 # winning reward to add if the attacker goal is reached
+train_iterations: 25000 # number of training iterations
+switch_interval: 5 # across the training set, in episodes
+absolute_reward: False # whether to have a reward = max(0, reward) of the original one
+losing_reward: -300 # losing reward to add if the attacker has lost
+random_starter_node: True # whether the starter node should be changed periodically and randomly during training
+stop_at_goal_reached: True # stop episode when goal is reached or not ?
+norm_obs: False # whether to normalize observations
+norm_reward: False # whether to normalize the reward
+nlp_extractor: bert # LLM to consider ("distilbert", "bert", "roberta", "gpt", ....) useful only for train file but not for the sample or hyperopt files
+distance_metric: cosine # distance metric to use in the action space to find the nearest neighbor
+interest_node_value: 200 # value of the node of interest
+switch_interest_node_interval: 5 # whether the node of interest should be switched periodically during training, or -1
+isolation_filter_threshold: 0.1 # whether some starter nodes should be avoided if they do not respect some conditions (do not reach this percentage of nodes)
+outcome_dimensions: 9
+discrete_features:
+  - "owned_nodes"
+  - "discovered_nodes"
+graph_embeddings_aggregations: # aggregation functions for the node embeddings to form the graph embedding
+  - 'mean'
+  - 'max'
+  - 'min'
+checkpoints_save_freq: 10000 # frequency of checkpoints saving during training
+
+sample_subset_samples: 100 # number of samples to sample per outcome if just a subset is considered
+remove_main_obstacles: True # whether to remove the main obstacles (e.g. DOS starter node)
+remove_all_obstacles: False # whether to remove all obstacles (e.g. DOS actions for control game)
+default_vulnerability_embeddings_size: 768
+
+# Defender
+static_defender_eviction_goal: True # if True, defender will try to evict all the nodes owned from the network
+# Minimum and maximum of every defender parameter forming a uniform distribution to be sampled from across topologies
+random_event_probability_min: 0.005
+random_event_probability_max: 0.01
+detect_probability_min: 0.05
+detect_probability_max: 0.05
+scan_capacity_min: 3
+scan_capacity_max: 3
+scan_frequency_min: 3
+scan_frequency_max: 3
+
+# Holdout method parameters
+validation_ratio: 0.25
+test_ratio: 0.2
+
+# Validation set callback
+val_switch_interval: 1 # in episodes, how frequently to switch the validation graphs in the set
+val_freq: 30000 # frequency of validation
+n_val_episodes: 10 # how many episodes to run overall every val_freq

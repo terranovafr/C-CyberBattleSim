@@ -1,0 +1,119 @@
+# mappings of category -> products to extend manually once new products are added
+
+windows:
+  - Microsoft IIS httpd
+  - Outlook Web App
+  - Remote Desktop Protocol
+  - VMware ESXi
+  - nginx
+  - Apache httpd
+  - Squid http proxy
+  - Exim smtpd
+  - Jetty
+  - MongoDB
+  - Jenkins
+  - MySQL
+  - Apache Tomcat
+  - Metabase
+  - NET-DK
+  - Node.js
+  - Tengine
+  - Wildix Collaboration
+
+unix:
+  - nginx
+  - VMware ESXi
+  - OpenSSH
+  - Nextcloud
+  - Elastic
+  - Apache httpd
+  - Squid http proxy
+  - Exim smtpd
+  - Jetty
+  - OpenResty
+  - ProFTPD
+  - MongoDB
+  - Jenkins
+  - Control Web Panel (CWP)
+  - MySQL
+  - Apache Tomcat
+  - Apache Tomcat/Coyote JSP engine
+  - Metabase
+  - NET-DK
+  - Node.js
+  - Tengine
+  - Wildix Collaboration
+
+iot:
+  - Hikvision IP Camera
+  - uc-httpd
+  - Grafana (Open Source)
+  - Grafana (Enterprise)
+  - RabbitMQ
+  - GoAhead Embedded Web Server
+  - lighttpd
+  - micro_httpd
+  - Boa Web Server
+  - Boa HTTPd
+  - Mini web server 1.0 ZTE corp 2005
+  - RocketMQ
+
+ics:
+  - DrayTek Vigor2925 Series
+  - DrayTek Vigor2862 Series
+  - DrayTek Vigor2860 Series
+  - DrayTek Vigor2762 Series
+  - DrayTek Vigor2912 Series
+  - DrayTek Vigor2926 Series
+  - DrayTek Vigor2133 Series
+  - DrayTek Vigor2927 Series
+  - DrayTek Vigor2865 Series
+  - DrayTek Vigor2765 Series
+
+routers:
+  - ZTE H268A
+  - ZTE ZXHN H168N
+  - ciscoSystems
+  - ZTE F680
+  - Bbox
+
+# Define a mapping of model identifiers to their respective model names
+model_identifiers:
+    gpt2: "gpt2"
+    bert: "bert-base-uncased"
+    roberta: "roberta-base"
+    distilbert: "distilbert-base-uncased"
+    SecBERT: "jackaduma/SecBERT"
+    SecRoBERTa: "jackaduma/SecRoBERTa"
+    SecureBERT: "ehsanaghaei/SecureBERT"
+    CySecBERT: "markusbayer/CySecBERT"
+
+# Define a mapping of products to their CPE base strings for well-known products ( = products for which we know the CPE )
+# otherwise the cpe will be approximated (may involve errors)
+product_cpe_map:
+    "apache httpd": "cpe:2.3:a:apache:http_server"
+    "apache tomcat": "cpe:2.3:a:apache:tomcat"
+    "squid http proxy": "cpe:2.3:a:squid-cache:squid"
+    "microsoft iis httpd": "cpe:2.3:a:microsoft:iis"
+    "exim smtpd": "cpe:2.3:a:exim:exim"
+    "boa web server": "cpe:2.3:a:boa:boa"
+    "hikvision ip camera": "cpe:2.3:h:hikvision:ds-2cd7153-e"
+    "draytek vigor2925 series": "cpe:2.3:h:draytek:vigor_2925n"
+    "draytek vigor2862 series": "cpe:2.3:h:draytek:vigor2862"
+    "draytek vigor2860 series": "cpe:2.3:h:draytek:vigor2860"
+    "draytek vigor2762 series": "cpe:2.3:h:draytek:vigor2762"
+    "draytek vigor2912 series": "cpe:2.3:h:draytek:vigor2915"
+    "draytek vigor2926 series": "cpe:2.3:h:draytek:vigor2926"
+    "draytek vigor2133 series": "cpe:2.3:h:draytek:vigor2133"
+    "draytek vigor2927 series": "cpe:2.3:h:draytek:vigor2927"
+    "draytek vigor2865 series": "cpe:2.3:h:draytek:vigor2865"
+    "draytek vigor2765 series": "cpe:2.3:h:draytek:vigor2765"
+    "grafana (open source)": "cpe:2.3:a:grafana:grafana"
+    "grafana (enterprise)": "cpe:2.3:a:grafana:grafana"
+    "zte h268a": "cpe:2.3:h:zte:*:"
+    "zte zxhn h168n": "cpe:2.3:h:zte:zxhn_h168n"
+    "boa httpd": "cpe:2.3:a:boa:boa"
+    "vmware esxi": "cpe:2.3:o:vmware:esxi"
+    "elastic": "cpe:2.3:a:elastic:elasticsearch"
+    "net-dk": "cpe:2.3:a:siemens:simatic_net_dk-16xx_pn_io"
+    "rocketmq": "cpe:2.3:a:apache:rocketmq"

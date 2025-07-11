@@ -1,0 +1,45 @@
+# Configuration file for information about the categories of the nodes and the services
+
+categories: ['iot', 'routers', 'windows', 'unix', 'ics']
+percentages_types:
+  iot:
+    iot: 1
+    routers: 0
+    windows: 0
+    unix: 0
+    ics: 0
+  routers:
+    iot: 0
+    routers: 1
+    windows: 0
+    unix: 0
+    ics: 0
+  windows:
+    iot: 0
+    routers: 0
+    windows: 1
+    unix: 0
+    ics: 0
+  unix:
+    iot: 0
+    routers: 0
+    windows: 0
+    unix: 1
+    ics: 0
+  ics:
+    iot: 0
+    routers: 0
+    windows: 0
+    unix: 0
+    ics: 1
+  mixed_equally:
+    iot: 0.2
+    routers: 0.2
+    windows: 0.2
+    unix: 0.2
+    ics: 0.2
+
+
+max_services: # know the maximum number of services to calculate the maximum unique combinations for the homogeneity, otherwise a node can have the same service multiple times
+    routers: 1 # just one service typically
+    ics: 1 # just one service typically

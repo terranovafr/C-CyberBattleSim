@@ -1,240 +1,224 @@
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2025 Franco Terranova.
 # Licensed under the MIT License.
 
-"""Data model for the simulation environment.
-
-The simulation environment is given by the directed graph
-formally defined by:
-
-  Node := NodeID x ListeningService[] x Value x Vulnerability[] x FirewallConfig
-  Edge := NodeID x NodeID x PortName
-
- where:
-  - NodeID: string
-  - ListeningService : Name x AllowedCredentials
-  - AllowedCredentials : string[] # credential pair represented by just a
-    string ID
-  - Value : [0...100]     # Intrinsic value of reaching this node
-  - Vulnerability : VulnerabilityID x Type x Precondition x Outcome x Rates
-  - VulnerabilityID : string
-  - Rates : ProbingDetectionRate x ExploitDetectionRate x SuccessRate
-  - FirewallConfig: {
-      outgoing :  FirwallRule[]
-      incoming : FirwallRule [] }
-  - FirewallRule: PortName x { ALLOW, BLOCK }
+"""
+    model.py
+    Data model for the simulation environment including all classes used by the environment and the model environment itself which constructs the network of nodes and the vulnerabilities associated with them.
 """
 
 from datetime import datetime
 from typing import NamedTuple, List, Dict, Optional, Union, Tuple, Iterator
 import dataclasses
 from dataclasses import dataclass, field
-import matplotlib.pyplot as plt  # type:ignore
 from enum import Enum, IntEnum
-from boolean import boolean
 import networkx as nx
-import yaml
+from cyberbattle.utils.networkx_utils import iterate_network_nodes, calculate_average_shortest_path_length
 import random
 
-import matplotlib  # type: ignore
+VERSION_TAG = "CC-1.0.0" # C-CyberBattleSim + version
 
-matplotlib.use("Agg")
-
-VERSION_TAG = "0.1.0"
-
-ALGEBRA = boolean.BooleanAlgebra()
-
-# Type alias for identifiers
+# Type aliases
 NodeID = str
-
-# A unique identifier
 ID = str
-
-# a (login,password/token) credential pair is abstracted as just a unique
-# string identifier
-CredentialID = str
-
-# Intrinsic value of a reaching a given node in [0,100]
 NodeValue = int
-
-
-PortName = str
+PortName = int
+VulnerabilityID = str
+Probability = float
+PropertyName = str
 
 
 @dataclass
 class ListeningService:
-    """A service port on a given node accepting connection initiated
-    with the specified allowed credentials"""
-
-    # Name of the port the service is listening to
+    """A service listening on a port of a given node hosting some vulnerabilities"""
+    # Port to which the service is listening to
     name: PortName
-    # credential allowed to authenticate with the service
-    allowedCredentials: List[CredentialID] = dataclasses.field(default_factory=list)
+    # product info
+    product: str
+    # product version info
+    version: str
+    # Feature vector for each NLP extractor (of the service description/response)
+    feature_vector: Dict
+    # description of the service response
+    description: str = ""
     # whether the service is running or stopped
     running: bool = True
     # Weight used to evaluate the cost of not running the service
     sla_weight = 1.0
 
-
-x = ListeningService(name="d")
-VulnerabilityID = str
-
-# Probability rate
-Probability = float
-
-# The name of a node property indicating the presence of a
-# service, component, feature or vulnerability on a given node.
-PropertyName = str
-
-
 class Rates(NamedTuple):
     """Probabilities associated with a given vulnerability"""
-
     probingDetectionRate: Probability = 0.0
     exploitDetectionRate: Probability = 0.0
     successRate: Probability = 1.0
 
-
 class VulnerabilityType(Enum):
     """Is the vulnerability exploitable locally or remotely?"""
-
-    LOCAL = 1
-    REMOTE = 2
-
+    LOCAL = 0
+    REMOTE = 1
 
 class PrivilegeLevel(IntEnum):
     """Access privilege level on a given node"""
-
     NoAccess = 0
     LocalUser = 1
-    Admin = 2
-    System = 3
-    MAXIMUM = 3
-
-
-def escalate(current_level, escalation_level: PrivilegeLevel) -> PrivilegeLevel:
-    return PrivilegeLevel(max(int(current_level), int(escalation_level)))
-
+    ROOT = 3 # assigned 3 to leave space for an intermediary level
 
 class VulnerabilityOutcome:
     """Outcome of exploiting a given vulnerability"""
 
+class Movement(VulnerabilityOutcome):
+    """Represent a general movement to another node"""
 
 class LateralMove(VulnerabilityOutcome):
     """Lateral movement to the target node"""
-
     success: bool
 
+class Collection(VulnerabilityOutcome):
+    """Collect data on target node"""
 
-class CustomerData(VulnerabilityOutcome):
-    """Access customer data on target node"""
+class CredentialAccess(VulnerabilityOutcome):
+    """Access the target node using some credentials found"""
 
+class Discovery(VulnerabilityOutcome):
+    """Discovery of properties of nodes (acquired visibility, e.g. OS and firewall)"""
 
 class PrivilegeEscalation(VulnerabilityOutcome):
     """Privilege escalation outcome"""
-
-    def __init__(self, level: PrivilegeLevel):
+    def __init__(self, level=PrivilegeLevel.ROOT):
         self.level = level
 
     @property
     def tag(self):
-        """Escalation tag that gets added to node properties when
-        the escalation level is reached for that node"""
+        # Escalation tag that gets added to node properties when the escalation level is reached for that node
         return f"privilege_{self.level}"
 
+class InvalidAction(VulnerabilityOutcome):
+    """This is for situations where the exploit fails (reason also explained by subclass)"""
+    def __init__(self, reason=""):
+        self.reason = reason
 
-class SystemEscalation(PrivilegeEscalation):
-    """Escalation to SYSTEM privileges"""
+class FirewallBlock(InvalidAction):
+    """Blocked by firewall (outgoing or incoming)"""
+    def __init__(self, incoming_or_outgoing, reason=""):
+        super().__init__(reason)
+        self.incoming_or_outgoing = incoming_or_outgoing
+        self.reason = reason
 
-    def __init__(self):
-        super().__init__(PrivilegeLevel.System)
+class NonListeningPort(InvalidAction):
+    """Port not listening, hence if a vulnerability is related to a service on that port, it cannot be exploited"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class OutcomeNonPresent(InvalidAction):
+    """Outcome non present/possible for a vulnerability (whether it is possible is given by the multi-label classifier)"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class NoEnoughPrivilege(InvalidAction):
+    """No enough privilege on node to exploit vulnerability"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class NonRunningMachine(InvalidAction):
+    """Machine not running"""
+    def __init__(self, source_or_target=0, reason=""):
+        super().__init__(reason)
+        self.source_or_target = source_or_target
+        self.reason = reason
+
+class UnsuccessfulAction(InvalidAction):
+    """Action unsuccessful based on success rate"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class RepeatedResult(InvalidAction):
+    """Outcome already exploited"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class NoNeededAction(InvalidAction):
+    """This is for situations where the action is useless"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class NoVulnerability(InvalidAction):
+    """Vulnerability not present on the node"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
+
+class RemoteOutcomeInLocalNode(InvalidAction):
+    """Wrong outcome in local vulnerability (e.g. credential access)"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
 
 
-class AdminEscalation(PrivilegeEscalation):
-    """Escalation to local administrator privileges"""
+class InvalidMovement(InvalidAction):
+    """Invalid movement"""
+    def __init__(self, reason=""):
+        super().__init__(reason)
+        self.reason = reason
 
-    def __init__(self):
-        super().__init__(PrivilegeLevel.Admin)
-
-
-class ProbeSucceeded(VulnerabilityOutcome):
-    """Probing succeeded"""
-
-    def __init__(self, discovered_properties: List[PropertyName]):
-        self.discovered_properties = discovered_properties
-
-
-class ProbeFailed(VulnerabilityOutcome):
-    """Probing failed"""
-
-
-class ExploitFailed(VulnerabilityOutcome):
-    """This is for situations where the exploit fails"""
-
-
-class CachedCredential(NamedTuple):
-    """Encodes a machine-port-credential triplet"""
-
-    node: NodeID
-    port: PortName
-    credential: CredentialID
-
-
-class LeakedCredentials(VulnerabilityOutcome):
-    """A set of credentials obtained by exploiting a vulnerability"""
-
-    credentials: List[CachedCredential]
-
-    def __init__(self, credentials: List[CachedCredential]):
-        self.credentials = credentials
-
-
-class LeakedNodesId(VulnerabilityOutcome):
+class Reconnaissance(VulnerabilityOutcome):
     """A set of node IDs obtained by exploiting a vulnerability"""
 
-    def __init__(self, nodes: List[NodeID]):
+    def __init__(self, nodes):
+        if not nodes:
+            nodes = []
         self.nodes = nodes
 
+class DenialOfService(VulnerabilityOutcome):
+    """Denial of service outcome"""
 
-VulnerabilityOutcomes = Union[LeakedCredentials, LeakedNodesId, PrivilegeEscalation, AdminEscalation, SystemEscalation, CustomerData, LateralMove, ExploitFailed]
+class NoOutcome(VulnerabilityOutcome):
+    """No outcome"""
 
+class Persistence(VulnerabilityOutcome):
+    """Persistence outcome"""
 
-class AttackResult:
-    """The result of attempting a specific attack (either local or remote)"""
+class Execution(VulnerabilityOutcome):
+    """Execution general outcome -> allows all the others"""
 
-    success: bool
-    expected_outcome: Union[VulnerabilityOutcomes, None]
+class Exfiltration(VulnerabilityOutcome):
+    """Exfiltration outcome"""
 
+class DefenseEvasion(VulnerabilityOutcome):
+    """Defense Evasion outcome"""
 
-class Precondition:
-    """A predicate logic expression defining the condition under which a given
-    feature or vulnerability is present or not.
-    The symbols used in the expression refer to properties associated with
-    the corresponding node.
-    E.g. 'Win7', 'Server', 'IISInstalled', 'SQLServerInstalled',
-    'AntivirusInstalled' ...
-    """
+VulnerabilityOutcomes = Union[
+    Discovery, PrivilegeEscalation, Reconnaissance, Collection, LateralMove, Persistence, DenialOfService, InvalidAction, CredentialAccess]
 
-    expression: boolean.Expression
+# Map outcome to index of the outcome
+def map_outcome_to_index(outcome):
+    outcomes = [Discovery, PrivilegeEscalation, Reconnaissance, Collection, LateralMove, Persistence, DenialOfService, InvalidAction, CredentialAccess]
+    outcome_to_index = {cls: idx for idx, cls in enumerate(outcomes)}
+    return outcome_to_index.get(outcome.__class__)
 
-    def __init__(self, expression: Union[boolean.Expression, str]):
-        if isinstance(expression, boolean.Expression):
-            self.expression = expression
-        else:
-            self.expression = ALGEBRA.parse(expression)
+class PredictedResult(NamedTuple):
+    """The predicted outcome allowed by exploiting a vulnerability"""
+    type: VulnerabilityType # gathered from CVSS vector
+    type_str: str
+    outcome: VulnerabilityOutcome # predicted by the multi-label classifier
+    outcome_str: str
+    probability: float # output probability of the multi label classifier
 
-
-class VulnerabilityInfo(NamedTuple):
+@dataclass
+class VulnerabilityInfo:
     """Definition of a known vulnerability"""
-
+    vulnerability_ID: str
+    # port of the service that has the vulnerability
+    port: PortName
     # an optional description of what the vulnerability is
     description: str
-    # type of vulnerability
-    type: VulnerabilityType
-    # what happens when successfully exploiting the vulnerability
-    outcome: VulnerabilityOutcome
-    # a boolean expression over a node's properties determining if the
-    # vulnerability is present or not
-    precondition: Precondition = Precondition("true")
+    # what happens when successfully exploiting the vulnerability (approximated outcomes by the multi-label classifier)
+    results: List[PredictedResult] = field(default_factory=list)
     # rates of success/failure associated with this vulnerability
     rates: Rates = Rates()
     # points to information about the vulnerability
@@ -242,72 +226,66 @@ class VulnerabilityInfo(NamedTuple):
     # some cost associated with exploiting this vulnerability (e.g.
     # brute force more costly than dumping credentials)
     cost: float = 1.0
+    # dict of embeddings for all models
+    embedding: Dict = field(default_factory=dict)
+    # metrics from CVSS
+    cvss: float = 0.0
+    cvss_v2: float = 0.0
+    epss: float = 0.0
+    ranking_epss: float = 0.0
+    attack_vector: str = ""
+    attack_complexity: str = ""
+    privileges_required: PrivilegeLevel = PrivilegeLevel.LocalUser
+    user_interaction: str = ""
+    confidentiality_impact: str = ""
+    integrity_impact: str = ""
+    availability_impact: str = ""
+    base_score: float = 0.0
+    exploitability_score: float = 0.0
+    impact_score: float = 0.0
+    base_severity: str = ""
     # a string displayed when the vulnerability is successfully exploited
     reward_string: str = ""
 
-
-# A dictionary storing information about all supported vulnerabilities
-# or features supported by the simulation.
-# This is to be used as a global dictionary pre-populated before
-# starting the simulation and estimated from real-world data.
+# A dictionary storing information about the vulnerabilities inside a node
 VulnerabilityLibrary = Dict[VulnerabilityID, VulnerabilityInfo]
-
 
 class RulePermission(Enum):
     """Determine if a rule is blocks or allows traffic"""
-
     ALLOW = 0
     BLOCK = 1
 
-
-@dataclass(frozen=True)
+@dataclass
 class FirewallRule:
     """A firewall rule"""
-
-    # A port name
+    # A port number/name
     port: PortName
     # permission on this port
     permission: RulePermission
     # An optional reason for the block/allow rule
     reason: str = ""
 
+    def __eq__(self, other):
+        if not isinstance(other, FirewallRule):
+            return NotImplemented
+        return (self.port, self.permission, self.reason) == (other.port, other.permission, other.reason)
+
+    def __hash__(self):
+        return hash((self.port, self.permission, self.reason))
+
 
 @dataclass
 class FirewallConfiguration:
     """Firewall configuration on a given node.
-    Determine if traffic should be allowed or specifically blocked
-    on a given port for outgoing and incoming traffic.
-    The rules are process in order: the first rule matching a given
-    port is applied and the rest are ignored.
-
-    Port that are not listed in the configuration
-    are assumed to be blocked. (Adding an explicit block rule
-    can still be useful to give a reason for the block.)
+    Determine if traffic should be allowed or specifically blocked on a given port for outgoing and incoming traffic.
+    The rules are process in order: the first rule matching a given port is applied and the rest are ignored.
     """
-
-    outgoing: List[FirewallRule] = field(
-        repr=True,
-        default_factory=lambda: [
-            FirewallRule("RDP", RulePermission.ALLOW),
-            FirewallRule("SSH", RulePermission.ALLOW),
-            FirewallRule("HTTPS", RulePermission.ALLOW),
-            FirewallRule("HTTP", RulePermission.ALLOW),
-        ],
-    )
-    incoming: List[FirewallRule] = field(
-        repr=True,
-        default_factory=lambda: [
-            FirewallRule("RDP", RulePermission.ALLOW),
-            FirewallRule("SSH", RulePermission.ALLOW),
-            FirewallRule("HTTPS", RulePermission.ALLOW),
-            FirewallRule("HTTP", RulePermission.ALLOW),
-        ],
-    )
+    outgoing: List[FirewallRule] = field(repr=True, default_factory=lambda: [])
+    incoming: List[FirewallRule] = field(repr=True, default_factory=lambda: [])
 
 
 class MachineStatus(Enum):
     """Machine running status"""
-
     Stopped = 0
     Running = 1
     Imaging = 2
@@ -316,239 +294,174 @@ class MachineStatus(Enum):
 @dataclass
 class NodeInfo:
     """A computer node in the enterprise network"""
-
-    # List of port/protocol the node is listening to
-    services: List[ListeningService]
-    # List of known vulnerabilities for the node
-    vulnerabilities: VulnerabilityLibrary = dataclasses.field(default_factory=dict)
-    # Intrinsic value of the node (translates into a reward if the node gets owned)
-    value: NodeValue = 0
-    # Properties of the nodes, some of which can imply further vulnerabilities
-    properties: List[PropertyName] = dataclasses.field(default_factory=list)
-    # Fireall configuration of the node
-    firewall: FirewallConfiguration = dataclasses.field(default_factory=FirewallConfiguration)
+    # Node ID
+    node_id: NodeID = ""
     # Attacker agent installed on the node? (aka the node is 'pwned')
     agent_installed: bool = False
-    # Esclation level
-    privilege_level: PrivilegeLevel = PrivilegeLevel.NoAccess
-    # Can the node be re-imaged by a defender agent?
-    reimagable: bool = True
     # Last time the node was reimaged
     last_reimaging: Optional[datetime] = None
     # String displayed when the node gets owned
     owned_string: str = ""
+    # tag representing the category (e.g. Windows, IoT, ...)
+    tag: str = ""
+    # List of services the node is hosting
+    services: List[ListeningService] = dataclasses.field(default_factory=list)
+    # Intrinsic value of the node (translates into a reward if the node gets owned)
+    value: NodeValue = 0
+    # Eventual properties of the nodes, not yet used in the simulation
+    properties: List[PropertyName] = dataclasses.field(default_factory=list)
+    # List of known vulnerabilities for the node
+    vulnerabilities: VulnerabilityLibrary = dataclasses.field(default_factory=dict)
+    # Firewall configuration of the node
+    firewall: FirewallConfiguration = field(default_factory=FirewallConfiguration)
+    # Current privilege escalation level
+    privilege_level: PrivilegeLevel = PrivilegeLevel.NoAccess
+    # Can the node be re-imaged by a defender agent?
+    reimageable: bool = True
     # Machine status: running or stopped
     status = MachineStatus.Running
-    # Relative node weight used to calculate the cost of stopping this machine
-    # or its services
+    # Relative node weight used to calculate the cost of stopping this machine or its services
     sla_weight: float = 1.0
+    # Is here data to be found using a collection vulnerability?
+    has_data: bool = False
+    # Has the data been collected ?
+    data_collected: bool = False
+    # Has the data been exfiltrated ?
+    data_exfiltrated: bool = False
+    # Partially visible or not?
+    visible: bool = True
+    # Persistence flag, ensuring that at reboot the agent will still be there
+    persistence: bool = False
+    # Defense evasion flag, ensuring that the agent will not be detected by firewall rules or can evade defender actions on node
+    defense_evasion: bool = False
+    # Privilege level when accessing the node
+    level_at_access: PrivilegeLevel = PrivilegeLevel.LocalUser
 
+def escalate(current_level, escalation_level: PrivilegeLevel) -> PrivilegeLevel:
+    return PrivilegeLevel(max(int(current_level), int(escalation_level)))
 
-class Identifiers(NamedTuple):
-    """Define the global set of identifiers used
-    in the definition of a given environment.
-    Such set defines a common vocabulary possibly
-    shared across multiple environments, thus
-    ensuring a consistent numbering convention
-    that a machine learniong model can learn from."""
+class NoSuitableStarterNode(Exception):
+    """Exception raised when no suitable starter node is found (no-one respects the isolation threshold)."""
+    def __init__(self, message="No suitable starter node found."):
+        self.message = message
+        super().__init__(self.message)
 
-    # Array of all possible node property identifiers
-    properties: List[PropertyName] = []
-    # Array of all possible port names
-    ports: List[PortName] = ["Null"]
-    # Array of all possible local vulnerabilities names
-    local_vulnerabilities: List[VulnerabilityID] = []
-    # Array of all possible remote vulnerabilities names
-    remote_vulnerabilities: List[VulnerabilityID] = []
-
-
-def iterate_network_nodes(network: nx.graph.Graph) -> Iterator[Tuple[NodeID, NodeInfo]]:
-    """Iterates over the nodes in the network"""
-    for nodeid, nodevalue in network.nodes.items():
-        node_data: NodeInfo = nodevalue["data"]
-        yield nodeid, node_data
-
-
-# NOTE: Using `NameTuple` instead of `dataclass` breaks deserialization
-# with PyYaml 2.8.1 due to a new recrusive references to the networkx graph in the field
-#   edges: !!python/object:networkx.classes.reportviews.EdgeView
-#     _adjdict: *id018
-#     _graph: *id019
 @dataclass
-class Environment:
-    """The static graph defining the network of computers"""
+class Model:
+    """ A static single graph defining a network of computers """
 
-    network: nx.DiGraph
-    vulnerability_library: VulnerabilityLibrary
-    identifiers: Identifiers
-    creationTime: datetime = datetime.utcnow()
-    lastModified: datetime = datetime.utcnow()
-    # a version tag indicating the environment schema version
-    version: str = VERSION_TAG
+    def __init__(self,
+                 network=None,
+                 creationTime=None,
+                 lastModified=None,
+                 version=VERSION_TAG,
+                 firewall_rule_incoming_probability=0.2,
+                 firewall_rule_outgoing_probability=0.2,
+                 knows_neighbor_probability_range=None,
+                 data_presence_probability=0.5,
+                 partial_visibility_probability=0.5,
+                 need_to_escalate_probability=0.5,
+                 service_shutdown_probability=0.1,
+                 success_rate_probability_range=None,
+                 probing_detection_probability_range=None,
+                 exploit_detection_probability_range=None,
+                 value_range=(0, 100),
+                 env_type="compressed_env",
+                 knows_graph=None,
+                 access_graph=None,
+                 evolving_visible_graph=None,
+                 vulnerability_classifier=None,
+                 **kwargs):
+
+        # Set the fields from arguments
+        self.network: nx.DiGraph = network
+        self.creationTime = creationTime if creationTime is not None else datetime.now()
+        self.lastModified = lastModified if lastModified is not None else datetime.now()
+        self.version = version
+        self.firewall_rule_incoming_probability = firewall_rule_incoming_probability
+        self.firewall_rule_outgoing_probability = firewall_rule_outgoing_probability
+        self.knows_neighbor_probability_range = knows_neighbor_probability_range
+        self.data_presence_probability = data_presence_probability
+        self.partial_visibility_probability = partial_visibility_probability
+        self.need_to_escalate_probability = need_to_escalate_probability
+        self.service_shutdown_probability = service_shutdown_probability
+        self.success_rate_probability_range = success_rate_probability_range
+        self.probing_detection_probability_range = probing_detection_probability_range
+        self.exploit_detection_probability_range = exploit_detection_probability_range
+        self.value_range = value_range
+        self.evolving_visible_graph = evolving_visible_graph
+        self.env_type = env_type
+        self.knows_graph = knows_graph
+        self.access_graph = access_graph
+
+        # imported here due to a circular import issue
+        import cyberbattle.simulation.generate_network as g
+
+        # Generate model from networkx graph and probabilities
+        self.network, self.knows_graph, self.access_graph, self.dos_graph, self.evolving_visible_graph, self.ports_list = g.cyberbattle_model_from_nodes_graph(
+                network,
+                firewall_rule_incoming_probability=self.firewall_rule_incoming_probability,
+                firewall_rule_outgoing_probability=self.firewall_rule_outgoing_probability,
+                knows_neighbor_probability_range=self.knows_neighbor_probability_range,
+                data_presence_probability=self.data_presence_probability,
+                partial_visibility_probability=self.partial_visibility_probability,
+                need_to_escalate_probability=self.need_to_escalate_probability,
+                service_shutdown_probability=self.service_shutdown_probability,
+                value_range=self.value_range,
+                vulnerability_classifier=vulnerability_classifier,
+                success_rate_probability_range=self.success_rate_probability_range,
+                probing_detection_probability_range=self.probing_detection_probability_range,
+                exploit_detection_probability_range=self.exploit_detection_probability_range,
+        )
+
+        # Calculate reachability, connectivity metric and dict of shortest paths for every pair of nodes
+        self.knows_reachability, self.knows_connectivity, self.knows_shortest_paths = calculate_average_shortest_path_length(self.knows_graph)
+        self.access_reachability, self.access_connectivity, self.access_shortest_paths = calculate_average_shortest_path_length(self.access_graph)
+        self.dos_reachability, self.dos_connectivity, self.dos_shortest_paths = calculate_average_shortest_path_length(self.dos_graph)
+
+    # Function used to update the feature vectors of the services and vulnerabilities embeddings using another feature extractor model
+    def update_feature_vectors(self, feature_extractor_model=None):
+        for node in self.network.nodes:
+            for i, service in enumerate(self.network.nodes[node]['data'].services):
+                self.network.nodes[node]['data'].services[i].feature_vector = service.feature_vector[feature_extractor_model]
+                for vulnerability in self.network.nodes[node]['data'].vulnerabilities:
+                    if isinstance(self.network.nodes[node]['data'].vulnerabilities[vulnerability].embedding, dict):
+                        self.network.nodes[node]['data'].vulnerabilities[vulnerability].embedding = self.network.nodes[node]['data'].vulnerabilities[vulnerability].embedding[feature_extractor_model]
+                    # otherwise already processed, case of multiple services in node with same vuln
 
     def nodes(self) -> Iterator[Tuple[NodeID, NodeInfo]]:
-        """Iterates over the nodes in the network"""
         return iterate_network_nodes(self.network)
 
     def get_node(self, node_id: NodeID) -> NodeInfo:
-        """Retrieve info for the node with the specified ID"""
-        node_info: NodeInfo = self.network.nodes[node_id]["data"]
+        node_info: NodeInfo = self.network.nodes[node_id]['data']
         return node_info
 
-    def plot_environment_graph(self) -> None:
-        """Plot the full environment graph"""
-        nx.draw(self.network, with_labels=True, node_color=[n["data"].value for i, n in self.network.nodes.items()], cmap=plt.cm.Oranges)  # type:ignore
 
+# Wrap networkx to the model needed to be wrapped to the environment
+def wrap_networkx_to_model(net, firewall_rule_incoming_probability_range, firewall_rule_outgoing_probability_range,
+                knows_neighbor_probability_range, need_to_escalate_probability_range, partial_visibility_probability_range,
+                                data_presence_probability_range, value_range, service_shutdown_probability_range, **kwargs):
+    if isinstance(net, tuple):
+        net = net[0]
+    firewall_rule_incoming_probability = random.uniform(firewall_rule_incoming_probability_range[0],
+                                                            firewall_rule_incoming_probability_range[1])
+    firewall_rule_outgoing_probability = random.uniform(firewall_rule_outgoing_probability_range[0],
+                                                            firewall_rule_outgoing_probability_range[1])
+    need_to_escalate_probability = random.uniform(need_to_escalate_probability_range[0], need_to_escalate_probability_range[1])
+    partial_visibility_probability = random.uniform(partial_visibility_probability_range[0], partial_visibility_probability_range[1])
+    data_presence_probability = random.uniform(data_presence_probability_range[0], data_presence_probability_range[1])
+    service_shutdown_probability = random.uniform(service_shutdown_probability_range[0], service_shutdown_probability_range[1])
 
-def create_network(nodes: Dict[NodeID, NodeInfo]) -> nx.DiGraph:
-    """Create a network with a set of nodes and no edges"""
-    graph = nx.DiGraph()
-    graph.add_nodes_from([(k, {"data": v}) for (k, v) in list(nodes.items())])
-    return graph
-
-
-# Helpers to infer constants from an environment
-
-
-def collect_ports_from_vuln(vuln: VulnerabilityInfo) -> List[PortName]:
-    """Returns all the port named referenced in a given vulnerability"""
-    if isinstance(vuln.outcome, LeakedCredentials):
-        return [c.port for c in vuln.outcome.credentials]
-    else:
-        return []
-
-
-def collect_vulnerability_ids_from_nodes_bytype(nodes: Iterator[Tuple[NodeID, NodeInfo]], global_vulnerabilities: VulnerabilityLibrary, type: VulnerabilityType) -> List[VulnerabilityID]:
-    """Collect and return all IDs of all vulnerability of the specified type
-    that are referenced in a given set of nodes and vulnerability library
-    """
-    return sorted(list({id for _, node_info in nodes for id, v in node_info.vulnerabilities.items() if v.type == type}.union(id for id, v in global_vulnerabilities.items() if v.type == type)))
-
-
-def collect_properties_from_nodes(nodes: Iterator[Tuple[NodeID, NodeInfo]]) -> List[PropertyName]:
-    """Collect and return sorted list of all property names used in a given set of nodes"""
-    return sorted({p for _, node_info in nodes for p in node_info.properties})
-
-
-def collect_ports_from_nodes(nodes: Iterator[Tuple[NodeID, NodeInfo]], vulnerability_library: VulnerabilityLibrary) -> List[PortName]:
-    """Collect and return all port names used in a given set of nodes
-    and global vulnerability library"""
-    return sorted(
-        list(
-            {port for _, v in vulnerability_library.items() for port in collect_ports_from_vuln(v)}.union(
-                {port for _, node_info in nodes for _, v in node_info.vulnerabilities.items() for port in collect_ports_from_vuln(v)}.union(
-                    {service.name for _, node_info in nodes for service in node_info.services}
-                )
-            )
-        )
-    )
-
-
-def collect_ports_from_environment(environment: Environment) -> List[PortName]:
-    """Collect and return all port names used in a given environment"""
-    return collect_ports_from_nodes(environment.nodes(), environment.vulnerability_library)
-
-
-def infer_constants_from_nodes(nodes: Iterator[Tuple[NodeID, NodeInfo]], vulnerabilities: Dict[VulnerabilityID, VulnerabilityInfo]) -> Identifiers:
-    """Infer global environment constants from a given network"""
-    return Identifiers(
-        properties=collect_properties_from_nodes(nodes),
-        ports=collect_ports_from_nodes(nodes, vulnerabilities),
-        local_vulnerabilities=collect_vulnerability_ids_from_nodes_bytype(nodes, vulnerabilities, VulnerabilityType.LOCAL),
-        remote_vulnerabilities=collect_vulnerability_ids_from_nodes_bytype(nodes, vulnerabilities, VulnerabilityType.REMOTE),
-    )
-
-
-def infer_constants_from_network(network: nx.Graph, vulnerabilities: Dict[VulnerabilityID, VulnerabilityInfo]) -> Identifiers:
-    """Infer global environment constants from a given network"""
-    return infer_constants_from_nodes(iterate_network_nodes(network), vulnerabilities)
-
-
-# Network creation
-
-# A sample set of envrionment constants
-SAMPLE_IDENTIFIERS = Identifiers(
-    ports=["RDP", "SSH", "SMB", "HTTP", "HTTPS", "WMI", "SQL"], properties=["Windows", "Linux", "HyperV-VM", "Azure-VM", "Win7", "Win10", "PortRDPOpen", "GuestAccountEnabled"]
-)
-
-
-def assign_random_labels(graph: nx.DiGraph, vulnerabilities: VulnerabilityLibrary = dict([]), identifiers: Identifiers = SAMPLE_IDENTIFIERS) -> nx.DiGraph:
-    """Create an envrionment network by randomly assigning node information
-    (properties, firewall configuration, vulnerabilities)
-    to the nodes of a given graph structure"""
-
-    # convert node IDs to string
-    graph = nx.relabel_nodes(graph, {i: str(i) for i in graph.nodes})
-
-    def create_random_firewall_configuration() -> FirewallConfiguration:
-        return FirewallConfiguration(
-            outgoing=[FirewallRule(port=p, permission=RulePermission.ALLOW) for p in random.sample(identifiers.ports, k=random.randint(0, len(identifiers.ports)))],
-            incoming=[FirewallRule(port=p, permission=RulePermission.ALLOW) for p in random.sample(identifiers.ports, k=random.randint(0, len(identifiers.ports)))],
-        )
-
-    def create_random_properties() -> List[PropertyName]:
-        return list(random.sample(identifiers.properties, k=random.randint(0, len(identifiers.properties))))
-
-    def pick_random_global_vulnerabilities() -> VulnerabilityLibrary:
-        count = random.random()
-        return {k: v for (k, v) in vulnerabilities.items() if random.random() > count}
-
-    def add_leak_neighbors_vulnerability(library: VulnerabilityLibrary, node_id: NodeID) -> None:
-        """Create a vulnerability for each node that reveals its immediate neighbors"""
-        neighbors = {t for (s, t) in graph.edges() if s == node_id}
-        if len(neighbors) > 0:
-            library["RecentlyAccessedMachines"] = VulnerabilityInfo(description="AzureVM info, including public IP address", type=VulnerabilityType.LOCAL, outcome=LeakedNodesId(list(neighbors)))
-
-    def create_random_vulnerabilities(node_id: NodeID) -> VulnerabilityLibrary:
-        library = pick_random_global_vulnerabilities()
-        add_leak_neighbors_vulnerability(library, node_id)
-        return library
-
-    # Pick a random node as the agent entry node
-    entry_node_index = random.randrange(len(graph.nodes))
-    entry_node_id, entry_node_data = list(graph.nodes(data=True))[entry_node_index]
-    graph.nodes[entry_node_id].clear()
-    node_data = NodeInfo(
-        services=[],
-        value=0,
-        properties=create_random_properties(),
-        vulnerabilities=create_random_vulnerabilities(entry_node_id),
-        firewall=create_random_firewall_configuration(),
-        agent_installed=True,
-        reimagable=False,
-        privilege_level=PrivilegeLevel.Admin,
-    )
-    graph.nodes[entry_node_id].update({"data": node_data})
-
-    def create_random_node_data(node_id: NodeID) -> NodeInfo:
-        return NodeInfo(
-            services=[],
-            value=random.randint(0, 100),
-            properties=create_random_properties(),
-            vulnerabilities=create_random_vulnerabilities(node_id),
-            firewall=create_random_firewall_configuration(),
-            agent_installed=False,
-            privilege_level=PrivilegeLevel.NoAccess,
-        )
-
-    for node in list(graph.nodes):
-        if node != entry_node_id:
-            graph.nodes[node].clear()
-            graph.nodes[node].update({"data": create_random_node_data(node)})
-
-    return graph
-
-
-# Serialization
-
-
-def setup_yaml_serializer() -> None:
-    """Setup a clean YAML formatter for object of type Environment."""
-    yaml.add_representer(Precondition, lambda dumper, data: dumper.represent_scalar("!BooleanExpression", str(data.expression)))  # type: ignore
-    yaml.SafeLoader.add_constructor("!BooleanExpression", lambda loader, expression: Precondition(loader.construct_scalar(expression)))  # type: ignore
-    yaml.add_constructor("!BooleanExpression", lambda loader, expression: Precondition(loader.construct_scalar(expression)))  # type: ignore
-
-    yaml.add_representer(VulnerabilityType, lambda dumper, data: dumper.represent_scalar("!VulnerabilityType", str(data.name)))  # type: ignore
-
-    yaml.SafeLoader.add_constructor("!VulnerabilityType", lambda loader, expression: VulnerabilityType[loader.construct_scalar(expression)])  # type: ignore
-    yaml.add_constructor("!VulnerabilityType", lambda loader, expression: VulnerabilityType[loader.construct_scalar(expression)])  # type: ignore
+    probabilities = {
+        'firewall_rule_incoming_probability': firewall_rule_incoming_probability,
+        'firewall_rule_outgoing_probability': firewall_rule_outgoing_probability,
+        'knows_neighbor_probability_range': knows_neighbor_probability_range,
+        'value_range': value_range,
+        'need_to_escalate_probability': need_to_escalate_probability,
+        'partial_visibility_probability': partial_visibility_probability,
+        'data_presence_probability': data_presence_probability,
+        'service_shutdown_probability': service_shutdown_probability
+    }
+    kwargs.update(probabilities)
+    model_env = Model(network=net, env_type="shodan_env", **kwargs)
+    return model_env

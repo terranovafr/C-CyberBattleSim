@@ -1,0 +1,15 @@
+# Remote URLs used to download the default components of the project
+vulnerability_classifier_url: "https://www.dropbox.com/scl/fi/u0t4pk9os7b4rtqi6k80x/classifier.zip?rlkey=vxmk7h45h8bm2bt4xt3xzjdn9&st=6lr939va&dl=1"
+vulnerability_classifier_base_identifier: "ehsanaghaei/SecureBERT"
+vulnerability_classifier_README_url: "https://www.dropbox.com/scl/fi/yol4ga7uuvvahmnyo0skl/README.md?rlkey=dc29gi0bzd300eln21rsnd8ci&st=r6ioozsi&dl=1"
+default_database_url: "https://www.dropbox.com/scl/fi/s1e3bmoxzyteyhsixxoom/default_data.zip?rlkey=gtd1jz840fpvu527icapjbu4s&st=f5y1usvf&dl=1"
+gae_url: "https://www.dropbox.com/scl/fi/80t02bvzh65ixrqnaw6yz/gae.zip?rlkey=rwbv3vhm687pyyglgn4iisklb&st=zftynzv9&dl=1"
+default_environments_url: "https://www.dropbox.com/scl/fi/mpuljepg840wxhge46cjh/scenarios.zip?rlkey=gtc2n1f4i4kjv7qfvabta7gej&st=hnv1cho9&dl=1"
+
+# Internal paths used to identify main components
+vulnerability_classifier_path: "classifier" # relative to cyberbattle/models
+nvd_data_path: "default_data" # relative to cyberbattle/data/scrape_samples
+gae_path: "default" # relative to cyberbattle/gae/logs
+#gae_dimensionality_reduction_path: # paths of GAE models trained on spaces with dimensionality reduction applied
+#  10: "num_components=10" # relative to cyberbattle/gae/logs (optional)
+default_environments_path: "default"

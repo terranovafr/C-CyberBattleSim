@@ -1,0 +1,35 @@
+# hyperparams_ranges.yaml
+# This file contains the ranges to consider during the optimization of the hyper-parameters for the GAE
+
+batch_size:
+  type: "categorical"
+  values: [16, 32, 64, 128]
+
+learning_rate:
+  type: "categorical"
+  values: [0.00001, 0.00005, 0.0001, 0.001, 0.01]
+
+num_layers:
+  type: "int"
+  min: 2
+  max: 4
+
+model_config:
+  layer_template:
+    - type: 'NNConv'
+      NN_channels: # NNConv considers also this number which is used to map the edge features to some embeddings that can be mixed with the node features
+        type: "categorical"
+        values: [16, 32, 64]
+      out_channels:
+        type: "categorical"
+        values: [16, 32, 64]
+      activation:
+        type: "categorical"
+        values: ['leakyReLU', 'ReLU', 'null']
+    - type: 'GCNConv'
+      out_channels:
+        type: "categorical"
+        values: [16, 32, 64]
+      activation:
+        type: "categorical"
+        values: ['leakyReLU', 'ReLU', 'null']

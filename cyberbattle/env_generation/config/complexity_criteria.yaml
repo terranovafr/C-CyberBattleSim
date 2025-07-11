@@ -1,0 +1,15 @@
+# YAML file indicating whether a higher value of each feature determine more complexity or less complexity
+
+num_nodes: maximize
+num_unique_combinations: maximize
+firewall_rule_incoming_probability: maximize
+firewall_rule_outgoing_probability: maximize
+knows_neighbor_probability: minimize
+need_to_escalate_probability: maximize
+partial_visibility_probability: maximize
+data_presence_probability: minimize
+service_shutdown_probability: maximize
+success_rate_probability_range: minimize
+knows_connectivity: minimize
+access_connectivity: minimize
+dos_connectivity: minimize

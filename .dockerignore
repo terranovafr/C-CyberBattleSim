@@ -1,5 +1,9 @@
 /venv/**
-/.cache/**
-**/*.pyc
+**/logs/**
+/typings/**
 **/__pycache__
-**/log.txt
+cyberbattle/data/*
+cyberbattle/agents/logs/*
+cyberbattle/gae/logs/*
+cyberbattle/models/*
+cyberbattle/visualization/logs/*

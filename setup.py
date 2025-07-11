@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2025 Franco Terranova.
 # Licensed under the MIT License.
 
 """setup CyberBattle simulator module"""
@@ -11,9 +12,8 @@ from typing import List
 
 pwd = os.path.dirname(__file__)
 
-
 def get_install_requires(requirements_txt) -> List[str]:
-    """get the list of requried packages"""
+    """get the list of required packages"""
     install_requires = []
     with open(os.path.join(pwd, requirements_txt)) as file:
         for line in file:
@@ -25,11 +25,12 @@ def get_install_requires(requirements_txt) -> List[str]:
 
 # main setup kw args
 setup_kwargs = {
-    "name": "cyberbattlesim",
-    "version": "0.1.0",
-    "description": "An experimentation and research platform to investigate the interaction of automated agents in an abstract simulated network environments.",
-    "author": "CyberBattleSim Team",
-    "author_email": "cyberbattlesim@microsoft.com",
+    "name": "ccyberbattlesim",
+    "version": "1.0.0",
+    "description": "Continuous CyberBattleSim, an extension of Microsoft CyberBattleSim for training RL agents on Cyber-Attack Paths Prediction",
+    "author": "Franco Terranova",
+    "packages": ['cyberbattle'],
+    "author_email": "franco.terranova@inria.fr",
     "install_requires": get_install_requires("requirements.txt"),
     "classifiers": [
         "Environment :: Other Environment",
@@ -39,9 +40,7 @@ setup_kwargs = {
         "Programming Language :: Python",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    "zip_safe": True,
-    "packages": setuptools.find_packages(exclude=["test_*.py", "*_test.py"]),
-    "extras_require": {"dev": get_install_requires("requirements.dev.txt")},
+    "zip_safe": True
 }
 
 if __name__ == "__main__":

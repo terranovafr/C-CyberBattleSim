@@ -1,0 +1,137 @@
+# File containing the optimal hyper-parameters configuration for each algorithm found after the hyper-parameter optimization process
+# or in general the algorithm hyper-parameters to use
+# This file is used by the train_agent.py, sample_agent.py, hyperopt_agent.py scripts
+
+policy_kwargs:
+  net_arch: [256, 128, 64]
+  activation_fn: LeakyReLU
+  optimizer_class: Adam
+  optimizer_kwargs:
+    eps: 0.0000001
+    weight_decay: 0.0001
+    amsgrad: False
+  lstm_hidden_size: 32
+  n_lstm_layers: 1
+
+trpo:
+  learning_rate_type: constant
+  learning_rate: 0.0001
+  n_steps: 4096
+  batch_size: 64
+  gamma: 0.95
+  cg_max_steps: 15
+  cg_damping: 0.1
+  line_search_shrinking_factor: 0.8
+  line_search_max_iter: 10
+  n_critic_updates: 10
+  gae_lambda: 0.9
+  use_sde: False
+  normalize_advantage: True
+  target_kl: 0.01
+  sub_sampling_factor: 1
+a2c:
+  learning_rate: 0.001
+  learning_rate_type: constant
+  learning_rate_final: 0.00001
+  gamma: 0.95
+  gae_lambda: 1
+  max_grad_norm: 0.3
+  rms_prop_eps: 0.00001
+  use_rms_prop: True
+  use_sde: False
+  sde_sample_freq: -1
+  normalize_advantage: True
+  n_steps: 20
+  ent_coef: 0.01
+  vf_coef: 1.5
+ppo:
+  n_steps: 1024
+  ent_coef: 0.2
+  vf_coef: 0.5
+  learning_rate: 0.0001
+  learning_rate_type: constant
+  learning_rate_final: 0.00001
+  batch_size: 128
+  n_epochs: 20
+  gamma: 0.9
+  gae_lambda: 0.95
+  clip_range: 0.2
+  normalize_advantage: True
+  max_grad_norm: 0.3
+rppo:
+  n_steps: 1024
+  ent_coef: 0.2
+  vf_coef: 0.5
+  learning_rate: 0.0001
+  learning_rate_type: constant
+  learning_rate_final: 0.00001
+  batch_size: 128
+  n_epochs: 20
+  gamma: 0.9
+  gae_lambda: 0.95
+  clip_range: 0.2
+  normalize_advantage: True
+  max_grad_norm: 0.3
+td3:
+  learning_rate_type: constant
+  learning_rate: 0.001
+  buffer_size: 100000
+  learning_starts: 100
+  batch_size: 128
+  tau: 0.005
+  gamma: 0.95
+  train_freq: 1
+  gradient_steps: 1
+  action_noise: null
+  policy_delay: 2
+  target_policy_noise: 0.3
+  target_noise_clip: 0.5
+sac:
+  learning_rate_type: constant
+  learning_rate: 0.01
+  buffer_size: 1000000
+  learning_starts: 100
+  batch_size: 128
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  action_noise: null
+  ent_coef: 'auto'
+  target_update_interval: 1
+  target_entropy: -0.5
+  use_sde: False
+  sde_sample_freq: -1
+  use_sde_at_warmup: False
+tqc:
+  learning_rate_type: constant
+  learning_rate: 0.0001
+  buffer_size: 1000000
+  learning_starts: 100
+  batch_size: 64
+  tau: 0.005
+  gamma: 0.95
+  train_freq: 1
+  gradient_steps: 1
+  action_noise: null
+  ent_coef: 0.2
+  target_update_interval: 1
+  target_entropy: 'auto'
+  top_quantiles_to_drop_per_net: 2
+  use_sde: False
+  sde_sample_freq: -1
+  use_sde_at_warmup: False
+ddpg:
+  learning_rate_type: constant
+  learning_rate: 0.001
+  buffer_size: 1000000
+  learning_starts: 100
+  batch_size: 256
+  tau: 0.005
+  gamma: 0.99
+  train_freq: 1
+  gradient_steps: 1
+  action_noise: null
+dqn:
+  learning_rate_type: constant
+  learning_rate: 0.0001

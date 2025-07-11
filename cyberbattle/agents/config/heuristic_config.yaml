@@ -1,0 +1,34 @@
+# Configuration file used for the heuristic agent, which is used for comparison with the agent
+
+episode_iterations: 1000 # cut-off considered regardless of K
+proportional_cutoff_coefficient: 10 # whether to use a cut-off proportional to the number of nodes (K) and of how much, or -1 if not
+num_episodes_per_checkpoint: 2400
+switch_interval: 5 # in episodes across the testing topologies
+isolation_filter_threshold: 0.01
+
+
+# defender
+static_defender_eviction_goal: True # if True, defender will try to evict all the nodes owned from the network
+random_event_probability: 0.01 # RandomEventsDefender
+detect_probability: 0.01 # ScanAndReimageDefender
+scan_capacity: 3
+scan_frequency: 3
+
+
+##### TRAIN CONFIG JUST FOR PARAMETER COMPATIBILITY (AS THEY ARE MANDATORY)\
+#### Not used by the heuristic agent, but needed for the environment
+
+winning_reward: 300 # winning reward to add if the attacker goal is reached
+random_starter_node: True # whether the starter node should be changed periodically and randomly during training
+stop_at_goal_reached: True # stop episode when goal is reached or not ?
+nlp_extractor: bert # LLM to consider ("distilbert", "bert", "roberta", "gpt", ....) useful only for train file but not for the sample or hyperopt files
+distance_metric: cosine # distance metric to use in the action space to find the nearest neighbor
+sample_subset_samples: 100 # number of samples to sample per outcome if just a subset is considered
+remove_main_obstacles: True # whether to remove the main obstacles (e.g. DOS starter node)
+remove_all_obstacles: False # whether to remove all obstacles (e.g. DOS actions for control game)
+graph_encoder_config_path: ../gae/logs/GAE_2024-11-20_08-59-57/bert/train_config_encoder.yaml
+graph_encoder_path: ../gae/logs/GAE_2024-11-20_08-59-57/bert/encoder.pth
+graph_encoder_spec_path: ../gae/logs/GAE_2024-11-20_08-59-57/bert/model_spec.yaml
+pca_components: 768
+norm_obs: False
+norm_reward: False

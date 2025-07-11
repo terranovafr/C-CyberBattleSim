@@ -1,0 +1,162 @@
+# Algorithm specific hyperparameters ranges to use for hyper-parameter optimization
+
+ppo:
+  learning_rate:
+    type: "categorical"
+    values: [ 0.00001, 0.0001, 0.001 ]
+  batch_size:
+    type: "categorical"
+    values: [ 32, 64, 128 ]
+  gamma:
+    type: "categorical"
+    values: [ 0.9, 0.95, 0.99 ]
+  n_steps:
+    type: "categorical"
+    values: [ 512, 1024, 2048 ]
+  ent_coef:
+    type: "categorical"
+    values: [ 0.01, 0.1, 0.2 ]
+  max_grad_norm:
+    type: "categorical"
+    values: [ 0.1, 0.3, 0.5 ]
+
+trpo:
+  learning_rate:
+      type: "categorical"
+      values: [ 0.0001, 0.001, 0.01 ]
+  batch_size:
+      type: "categorical"
+      values: [ 64, 128, 256 ]
+  gamma:
+      type: "categorical"
+      values: [ 0.9, 0.95, 0.99 ]
+  n_steps:
+      type: "categorical"
+      values: [ 1024, 2048, 4096 ]
+  gae_lambda:
+      type: "categorical"
+      values: [ 0.9, 0.95, 0.99 ]
+  target_kl:
+      type: "categorical"
+      values: [ 0.01, 0.05, 0.1 ]
+
+a2c:
+    learning_rate:
+        type: "categorical"
+        values: [ 0.0001, 0.001, 0.01 ]
+    gamma:
+        type: "categorical"
+        values: [ 0.9, 0.95, 0.99 ]
+    n_steps:
+        type: "categorical"
+        values: [ 5, 10, 20 ]
+    ent_coef:
+        type: "categorical"
+        values: [ 0.01, 0.1, 0.2 ]
+    vf_coef:
+        type: "categorical"
+        values: [ 0.5, 1.0, 1.5 ]
+    max_grad_norm:
+        type: "categorical"
+        values: [ 0.3, 0.5, 0.7 ]
+
+ddpg:
+  learning_rate:
+    type: "categorical"
+    values: [0.0001, 0.001, 0.01]
+  batch_size:
+    type: "categorical"
+    values: [64, 128, 256]
+  gamma:
+    type: "categorical"
+    values: [0.9, 0.95, 0.99]
+  tau:
+    type: "categorical"
+    values: [0.001, 0.005, 0.01]
+  buffer_size:
+    type: "categorical"
+    values: [100000, 500000, 1000000]
+  gradient_steps:
+    type: "categorical"
+    values: [1, 5, 10]
+
+
+rppo:
+  learning_rate:
+    type: "categorical"
+    values: [ 0.00001, 0.0001, 0.001 ]
+  batch_size:
+    type: "categorical"
+    values: [ 32, 64, 128 ]
+  gamma:
+    type: "categorical"
+    values: [ 0.9, 0.95, 0.99 ]
+  n_steps:
+    type: "categorical"
+    values: [ 512, 1024, 2048 ]
+  ent_coef:
+    type: "categorical"
+    values: [ 0.01, 0.1, 0.2 ]
+  max_grad_norm:
+    type: "categorical"
+    values: [ 0.1, 0.3, 0.5 ]
+
+sac:
+  learning_rate:
+    type: "categorical"
+    values: [0.00001, 0.0001, 0.001]
+  gamma:
+    type: "categorical"
+    values: [0.9, 0.95, 0.99]
+  tau:
+    type: "categorical"
+    values: [0.0005, 0.001, 0.005]
+  batch_size:
+    type: "categorical"
+    values: [32, 64, 128]
+  buffer_size:
+    type: "categorical"
+    values: [100000, 500000, 1000000]
+  target_entropy:
+    type: "categorical"
+    values: [-2, -1.5, -1.0]
+
+td3:
+  learning_rate:
+    type: "categorical"
+    values: [0.0001, 0.001, 0.01]
+  gamma:
+    type: "categorical"
+    values: [0.9, 0.95, 0.99]
+  tau:
+    type: "categorical"
+    values: [0.001, 0.005, 0.01]
+  buffer_size:
+    type: "categorical"
+    values: [100000, 500000, 1000000]
+  batch_size:
+    type: "categorical"
+    values: [64, 128, 256]
+  target_policy_noise:
+    type: "categorical"
+    values: [0.1, 0.2, 0.3]
+
+tqc:
+  learning_rate:
+    type: "categorical"
+    values: [0.0001, 0.001, 0.01]
+  gamma:
+    type: "categorical"
+    values: [0.9, 0.95, 0.99]
+  tau:
+    type: "categorical"
+    values: [0.001, 0.005, 0.01]
+  buffer_size:
+    type: "categorical"
+    values: [100000, 500000, 1000000]
+  batch_size:
+    type: "categorical"
+    values: [64, 128, 256]
+  ent_coef:
+    type: "categorical"
+    values: [0.01, 0.1, 0.2]

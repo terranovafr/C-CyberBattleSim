@@ -1,0 +1,15 @@
+# Configuration file for the test_agent.py file
+
+proportional_cutoff_coefficient: 2  # Whether to use the K coefficient for the cutoff and which coefficient
+num_episodes_per_checkpoint: 20 # Number of episodes to run during testing for every checkpoint
+num_iterations: 1000 # Other cutoff general that is considered regardless of K (to be set higher than K * max number of nodes if do not want to stop the episodes
+switch_interval: 5 # in episodes across the testing topologies
+isolation_filter_threshold: 0.01
+default_vulnerability_embeddings_size: 768
+
+# Static defender if integrated
+static_defender_eviction_goal: True # if True, defender will try to evict all the nodes owned from the network
+random_event_probability: 0.01 # RandomEventsDefender
+detect_probability: 0.01 # ScanAndReimageDefender
+scan_capacity: 3
+scan_frequency: 3

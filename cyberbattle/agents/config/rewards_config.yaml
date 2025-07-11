@@ -1,0 +1,185 @@
+# Reward and penalties coefficients for each goal (control, control_node, disruption, disruption_node, discovery, discovery_node)
+
+rewards_dict:
+  control:
+    value_coefficient: 3 # multiplies the value of the node owned exploiting the vulnerability
+    cost_coefficient: 1 # multiplies the cost of the vulnerability
+    node_discovered_coefficient: 25 # multiplier of the number of nodes discovered exploiting the vulnerability
+    data_collected_reward: 20 # reward for collecting data (constant)
+    data_exfiltrated_reward: 20 # reward for exfiltrating data (constant)
+    persistence_reward: 20 # reward for persistence (constant)
+    privilege_escalation_reward: 100 # reward for privilege escalation (constant)
+    acquired_visibility_reward: 20 # reward for acquiring visibility (constant)
+    dos_coefficient: -2 # multiplier of the value of the node attacked with DoS (negative action for control goals but not for disruption)
+    defense_evaded_reward: 20 # reward for evading defense (constant)
+  control_node:
+    value_coefficient: 2
+    cost_coefficient: 1
+    node_discovered_coefficient: 15
+    data_collected_reward: 10
+    data_exfiltrated_reward: 10
+    persistence_reward: 10
+    privilege_escalation_reward: 50
+    acquired_visibility_reward: 10
+    dos_coefficient: -1
+    defense_evaded_reward: 10
+  disruption:
+    value_coefficient: 0.5
+    cost_coefficient: 1
+    node_discovered_coefficient: 10
+    data_collected_reward: 0
+    persistence_reward: 0
+    privilege_escalation_reward: 0
+    acquired_visibility_reward: 10
+    dos_coefficient: 5
+    data_exfiltrated_reward: 0
+    defense_evaded_reward: 10
+  disruption_node:
+    value_coefficient: 0.5
+    cost_coefficient: 1
+    node_discovered_coefficient: 5
+    data_collected_reward: 0
+    persistence_reward: 0
+    privilege_escalation_reward: 0
+    acquired_visibility_reward: 10
+    dos_coefficient: 1
+    data_exfiltrated_reward: 0
+    defense_evaded_reward: 10
+  discovery:
+    value_coefficient: 1
+    cost_coefficient: 1
+    node_discovered_coefficient: 100
+    data_collected_reward: 100
+    persistence_reward: 0
+    privilege_escalation_reward: 50
+    acquired_visibility_reward: 100
+    dos_coefficient: -2
+    data_exfiltrated_reward: 100
+    defense_evaded_reward: 25
+  discovery_node:
+    value_coefficient: 1
+    cost_coefficient: 1
+    node_discovered_coefficient: 20
+    data_collected_reward: 50
+    persistence_reward: 0
+    privilege_escalation_reward: 25
+    acquired_visibility_reward: 50
+    dos_coefficient: -1
+    data_exfiltrated_reward: 500
+    defense_evaded_reward: 10
+
+penalties_dict:
+  control:
+    no_vulnerability_in_node: -10 # penalty for trying to exploit a vulnerability not present in a node (should not be present in the last version)
+    no_enough_privileges: -10 # penalty for trying to exploit a vulnerability without enough privileges
+    success_rate_failed: 0 # penalty for failing to exploit a vulnerability
+    no_data_to_collect: -10 # penalty for trying to collect data from a node without data
+    no_data_to_exfiltrate: -10 # penalty for trying to exfiltrate data from a node without data collected or no data in general
+    already_persistent: -10 # penalty for trying to persist in a node in which we are already persistent
+    machine_already_stopped: -10 # penalty for trying to stop a node that is already stopped
+    node_already_owned: -10 # penalty for trying to own a node that is already owned
+    node_already_visible: -10 # penalty for trying to acquire visibility in a node that is already visible
+    already_defense_evasion: -10 # penalty for trying to evade defense in a node that is already evading defense
+    scanning_unopen_port: -10 # penalty for using a vulnerability of a service in an unopen port
+    privilege_escalation_in_node_not_owned: -10 # penalty for trying to escalate privileges in a node that is not owned
+    privilege_escalation_to_level_already_had: -10 # penalty for trying to escalate privileges to a level that is already had
+    outcome_not_valid: -10 # invalid outcome on remote vulnerability
+    blocked_by_local_firewall: -10 # traffic blocked by outgoing rule in a local firewall
+    blocked_by_remote_firewall: -10 # traffic blocked by incoming rule in a local firewall
+    invalid_action: -50  # invalid action (e.g., running an attack from a node that's not owned)
+    distance_penalty: -3 # coefficient to be multiplied by the distance
+  control_node:
+    no_vulnerability_in_node: -10
+    no_enough_privileges: -10
+    success_rate_failed: 0
+    no_data_to_collect: -10
+    no_data_to_exfiltrate: -10
+    already_persistent: -10
+    node_already_stopped: -10
+    node_already_owned: -10
+    node_already_visible: -10
+    already_defense_evasion: -10
+    scanning_unopen_port: -10
+    privilege_escalation_in_node_not_owned: -10
+    privilege_escalation_to_level_already_had: -10
+    outcome_not_valid: -10
+    blocked_by_local_firewall: -10
+    blocked_by_remote_firewall: -10
+    invalid_action: 0
+    distance_penalty: -3
+  disruption:
+    no_vulnerability_in_node: -10
+    no_enough_privileges: -10
+    success_rate_failed: 0
+    no_data_to_collect: -10
+    no_data_to_exfiltrate: -10
+    already_persistent: -10
+    node_already_stopped: -10
+    node_already_owned: -10
+    node_already_visible: -10
+    already_defense_evasion: -10
+    scanning_unopen_port: -10
+    privilege_escalation_in_node_not_owned: -10
+    privilege_escalation_to_level_already_had: -10
+    outcome_not_valid: -10
+    blocked_by_local_firewall: -10
+    blocked_by_remote_firewall: -10
+    invalid_action: 0
+    distance_penalty: -3
+  disruption_node:
+    no_vulnerability_in_node: -10
+    no_enough_privileges: -10
+    success_rate_failed: 0
+    no_data_to_collect: -10
+    no_data_to_exfiltrate: -10
+    already_persistent: -10
+    node_already_stopped: -10
+    node_already_owned: -10
+    node_already_visible: -10
+    already_defense_evasion: -10
+    scanning_unopen_port: -10
+    privilege_escalation_in_node_not_owned: -10
+    privilege_escalation_to_level_already_had: -10
+    outcome_not_valid: -10
+    blocked_by_local_firewall: -10
+    blocked_by_remote_firewall: -10
+    invalid_action: 0
+    distance_penalty: -3
+  discovery:
+    no_vulnerability_in_node: -10
+    no_enough_privileges: -10
+    success_rate_failed: 0
+    no_data_to_collect: -10
+    no_data_to_exfiltrate: -10
+    already_persistent: -10
+    node_already_stopped: -10
+    node_already_owned: -10
+    node_already_visible: -10
+    already_defense_evasion: -10
+    scanning_unopen_port: -10
+    privilege_escalation_in_node_not_owned: -10
+    privilege_escalation_to_level_already_had: -10
+    outcome_not_valid: -10
+    blocked_by_local_firewall: -10
+    blocked_by_remote_firewall: -10
+    invalid_action: 0
+    distance_penalty: -3
+  discovery_node:
+    no_vulnerability_in_node: -10
+    no_enough_privileges: -10
+    success_rate_failed: 0
+    no_data_to_collect: -10
+    no_data_to_exfiltrate: -10
+    already_persistent: -10
+    node_already_stopped: -10
+    node_already_owned: -10
+    node_already_visible: -10
+    already_defense_evasion: -10
+    scanning_unopen_port: -10
+    privilege_escalation_in_node_not_owned: -10
+    privilege_escalation_to_level_already_had: -10
+    outcome_not_valid: -10
+    blocked_by_local_firewall: -10
+    blocked_by_remote_firewall: -10
+    invalid_action: 0
+    distance_penalty: -3
