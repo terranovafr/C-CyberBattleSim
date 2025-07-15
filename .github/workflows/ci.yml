@@ -2,11 +2,11 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
   push:
     branches:
       - main
-      - wiblum/*
-      - blumu/*
+      - test-mirror
 jobs:
   build:
     runs-on: ubuntu-latest
