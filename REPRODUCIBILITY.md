@@ -2,7 +2,7 @@
 
 To reproduce the results of the paper and the experiments, follow the steps below.
 
-Use the default scenarios and data provided in the associated [Zenodo data repository](https://zenodo.org/records/14604652/latest) to train the Graph Autoencoder (GAE) and DRL agents. If not already present, move the necessary files to the appropriate directories:
+Use the default scenarios and data provided in the associated [Zenodo data repository](https://doi.org/10.5281/zenodo.14604651) to train the Graph Autoencoder (GAE) and DRL agents. If not already present, move the necessary files to the appropriate directories:
 
 - `environment_database/*` → `cyberbattle/data/scrape_samples/default_data/`
 - `scenarios/*` → `cyberbattle/env_samples/`

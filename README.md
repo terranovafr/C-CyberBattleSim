@@ -27,11 +27,7 @@ The default files will include a default environment database, a default set of 
 
 > ### ⚠️ Setup API Keys Before Use
 >
-> Before using the environment, please ensure you configure the API keys in the following files:
->
-> - `_cyberbattle/data_generation/config/auth.yaml`
-> - `_cyberbattle/data_parser/config/auth.yaml`
->
+> Before using the environment, please ensure you configure the API keys in the `cyberbattle/data_generation/config/auth.yaml` file.
 > Setting these keys is necessary if you plan to scrape new data or generate new scenarios.
 > If you only rely on existing scenarios, you can skip this step.
 >
@@ -157,7 +153,7 @@ Refer to the documentation for usage instructions and detailed explanations of e
 ## Related repositories
 This simulator can reproduce the results presented in the paper using the same data and configurations.
 To reproduce the experiments follow the steps outlined in the _REPRODUCIBILITY.md_ file.
-A dedicated [Zenodo data](https://zenodo.org/records/15689667) repository contains the environment database leveraged in the paper, pre-generated scenarios, trained GAE and RL agent models, and logs for reproducing the results.
+A dedicated [Zenodo data](https://doi.org/10.5281/zenodo.14604651) repository contains the environment database leveraged in the paper, pre-generated scenarios, trained GAE and RL agent models, and logs for reproducing the results.
 
 ## Note on privacy
 
@@ -173,6 +169,7 @@ The code in this repository is available under the MIT License, see the LICENSE 
 - This tool leverages the Shodan API for data collection but is not officially affiliated with Shodan.
 - This work has been partially supported by the French National Research Agency under the France 2030 label (Superviz ANR-22-PECY-0008). The views reflected herein do not necessarily reflect the opinion of the French government.
 <div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Logo_Universit%C3%A9_de_Lorraine.svg/1280px-Logo_Universit%C3%A9_de_Lorraine.svg.png" alt="Universite de Lorraine" height="50"/>
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Inr_logo_rouge.svg/512px-Inr_logo_rouge.svg.png" alt="INRIA" height="50"/>
   <img src="https://upload.wikimedia.org/wikipedia/fr/6/6e/Logo_loria_abrege_couleur.png" alt="LORIA" height="70"/>
   <img src="https://www.pepr-cybersecurite.fr/wp-content/uploads/2023/09/pep-cybersecurite-550x250-1.png" alt="SuperViZ" height="70"/>
