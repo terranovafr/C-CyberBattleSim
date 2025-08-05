@@ -1,0 +1,85 @@
+{
+    "@context": "https://w3id.org/codemeta/3.0",
+    "type": "SoftwareSourceCode",
+    "applicationCategory": "Cybersecurity",
+    "author": [
+        {
+            "id": "https://orcid.org/0009-0001-6989-2655",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Université de Lorraine, CNRS, Inria, LORIA"
+            },
+            "email": "franco.terranova@inria.fr",
+            "familyName": "Terranova",
+            "givenName": "Franco"
+        },
+        {
+            "type": "Role",
+            "schema:author": "https://orcid.org/0009-0001-6989-2655",
+            "roleName": "Developer",
+            "startDate": "2024-04-01"
+        },
+        {
+            "id": "https://orcid.org/0000-0003-3882-1560",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Université de Lorraine, CNRS, Inria, LORIA"
+            },
+            "email": "abdelkader.lahmadi@loria.fr",
+            "familyName": "Lahmadi",
+            "givenName": "Abdelkader"
+        },
+        {
+            "type": "Role",
+            "schema:author": "https://orcid.org/0000-0003-3882-1560",
+            "roleName": "Supervisor"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-8474-0019",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Université de Lorraine, CNRS, Inria, LORIA"
+            },
+            "email": "isabelle.chrisment@loria.fr",
+            "familyName": "Chrisment",
+            "givenName": "Isabelle"
+        },
+        {
+            "type": "Role",
+            "schema:author": "https://orcid.org/0000-0002-8474-0019",
+            "roleName": "Supervisor"
+        }
+    ],
+    "codeRepository": "https://github.com/terranovafr/C-CyberBattleSim",
+    "dateCreated": "2025-07-15",
+    "datePublished": "2025-07-15",
+    "description": "Continuous CyberBattleSim (C-CyberBattleSim) is an advanced extension of Microsoft’s CyberBattleSim, introducing a world model that supports continuous state and action spaces. This enhancement enables the development of more scalable and generalizable reinforcement learning agents for cyber attack path prediction. The framework also includes an expanded scenario generation pipeline and a unified system for training and evaluation. ",
+    "funder": {
+        "type": "Organization",
+        "name": "PEPR SuperviZ"
+    },
+    "keywords": [
+        "reinforcement learning",
+        "artificial intelligence",
+        "machine learning",
+        "cyber-attack paths prediction",
+        "world model"
+    ],
+    "license": "https://spdx.org/licenses/MIT",
+    "name": "Continuous CyberBattleSim",
+    "programmingLanguage": "Python",
+    "relatedLink": [
+        "https://gitlab.inria.fr/resist/C-CyberBattleSim",
+        "https://c-cyberbattlesim.readthedocs.io/en/latest/home.html",
+        "https://bil.inria.fr/fr/software/view/5506/tab",
+        "https://zenodo.org/records/15908517"
+    ],
+    "version": "1.0.0",
+    "developmentStatus": "inactive",
+    "funding": "ANR-22-PECY-0008",
+    "isSourceCodeOf": "Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces",
+    "referencePublication": "https://hal.science/hal-05182437v1"
+}

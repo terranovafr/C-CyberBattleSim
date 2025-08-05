@@ -1,7 +1,7 @@
 # Continuous CyberBattleSim (C-CyberBattleSim)
 
 [![GitLab](https://img.shields.io/badge/GitLab-Repository-blue?logo=gitlab&logoColor=white)](https://gitlab.inria.fr/resist/C-CyberBattleSim)
-[![Documentation](https://img.shields.io/badge/Documentation-Read%20Docs-green?logo=read-the-docs&logoColor=white)](https://continuous-cyberbattlesim.readthedocs.io/en/latest/index.html)
+[![Documentation](https://img.shields.io/badge/Documentation-Read%20Docs-green?logo=read-the-docs&logoColor=white)](https://c-cyberbattlesim.readthedocs.io/en/latest/index.html)
 [![PhD theses.fr](https://img.shields.io/badge/Project-theses.fr-orange?logo=university&logoColor=white)](https://theses.fr/s371241)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BIL](https://img.shields.io/badge/BIL-Base%20Information%20Logiciel-purple?logo=information&logoColor=white)](https://bil.inria.fr/fr/software/view/5506/tab)
@@ -24,8 +24,16 @@ This project implements the advancements and extensions described in the paper:
 > ##### 📄 Paper Reference
 > Franco Terranova, Abdelkader Lahmadi, Isabelle Chrisment. Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces. _The 28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2025)_.
 
-The rest of this README offers a quick overview of usage. For complete details and in-depth information, please refer to the [official documentation](https://continuous-cyberbattlesim.readthedocs.io/en/latest/index.html).
+<img src="docs/source/images/home.png" alt="C-CyberBattleSim Overview" width="800"/>
 
+The main advancements are the following:
+
+1. **Automated Scenario Generation**: Utilizes data from Shodan and the NVD to extract real-world service distributions and vulnerabilities, generating diverse synthetic scenarios through domain randomization with configurable parameters.
+2. **Game Reformulation**: Enhances the attack environment modeling by reformulating it as a POMDP by incorporating richer features and transitions.
+3. **World Model Learning**: Employs Graph Neural Networks and Language Models to encode graph structures and vulnerability information into continuous latent embedding spaces.
+4. **Invariant Agent Architecture**: Redesigns observation and action spaces using the learned latent representations to ensure independence from specific topologies or vulnerability sets, enabling more scalable and generalizable RL agents.
+
+The rest of this README offers a quick overview of usage. For complete details and in-depth information, please refer to the [official documentation](https://c-cyberbattlesim.readthedocs.io/en/latest/index.html).
 ## Installation and Setup
 Install the required packages using Conda by running the following command:
 ```bash
@@ -169,7 +177,12 @@ Moreover, a sampling process can be performed using the `sample_agent.py` script
 ### Test the agent
 Trained models can be evaluated on test scenarios using:
 ```bash
-python3 test_agent.py --logs_folder AGENT_LOGS_FOLDER [--load_custom_test_envs TEST_ENVS] [--load_default_test_envs] [--last_checkpoint]  [--val_checkpoints] --option {'random_performances', 'action_distribution', 'agent_performances', ....} [--static_seed]
+python3 test_agent.py --logs_folder AGENT_LOGS_FOLDER \
+        [--load_custom_test_envs TEST_ENVS] \ 
+        [--load_default_test_envs] \ 
+        [--last_checkpoint]  [--val_checkpoints] \
+        --option {'action_distribution', 'agent_performances', ....} \ 
+        [--static_seed]
 ```
 The test configurations are stored in the `config/test_config.yaml` file.
 Test results, including trajectories, average scores, and action distribution analyses, will be saved in the _test_ subfolder inside the specified logs folder.
