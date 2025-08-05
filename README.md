@@ -24,8 +24,9 @@ This project implements the advancements and extensions described in the paper:
 > ##### 📄 Paper Reference
 > Franco Terranova, Abdelkader Lahmadi, Isabelle Chrisment. Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces. _The 28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2025)_.
 
-
+<p align="center">
 <img src="docs/source/images/home.png" alt="C-CyberBattleSim Overview" width="500"/>
+</p>
 
 The main advancements are the following:
 
