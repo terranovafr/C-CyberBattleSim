@@ -137,7 +137,7 @@ This path will be used as the default GAE model for downstream tasks.
 
 ## DRL Agents
 
-After generating scenarios, the Deep Reinforcement Learning (DRL) agent can be trained within the C-CyberBattleSim environment scenarios using an embedding model composed of the GAE and LMs for building the continuous spaces. The agent learns to optimize vulnerability path discovery with the objective of achieving specified goals.
+After generating scenarios, the Deep RL agent can be trained within the C-CyberBattleSim environment scenarios using an embedding model composed of the GAE and LMs for building the continuous spaces. The agent learns to optimize vulnerability path discovery with the objective of achieving specified goals.
 Navigate to the agents directory:
 ```bash
 cd cyberbattle/agents
@@ -159,7 +159,7 @@ python3 train_agent.py [--name NAME] \
         --nlp_extractor LM \
         [--holdout]
 ```
-The training script will train an RL algorithm with the proper space type (continuous by default) for a given goal on the scenarios specified.
+The training script will train a Deep RL algorithm with the proper space type (continuous by default) for a given goal on the scenarios specified.
 Other flags are available to set additional options related to training.
 Training logs and model checkpoints will be saved in the logs folder.
 Analogously, the hyper-parameters optimization can be performed using the `hyperopt_agent.py` script.
@@ -180,8 +180,8 @@ Test results, including trajectories, average scores, and action distribution an
 Testing can be performed on the best or all checkpoints, across training, validation, and various scenario sets.
 
 ### Visualize the agent
-Trained agents can be visualized to better understand their behavior and decision-making.  
-Visualization can replay trajectories and highlight chosen actions, and show the impact of the agent on the environment.
+Trained agents can be visualized to better understand their behavior and decision-making. Visualization can replay trajectories and highlight chosen actions, and show the impact of the agent on the environment.
+Similarly to the testing command and its options, run:
 
 ```bash
 python3 visualize_agent.py --logs_folder AGENT_LOGS_FOLDER \

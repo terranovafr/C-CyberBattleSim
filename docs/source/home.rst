@@ -81,7 +81,7 @@ License
 -----------------------------
 
 This project is released under the **MIT License**, a permissive open-source license that allows free use, modification, and distribution of the code, provided that the original copyright and license notice are included in all copies or substantial portions of the software.
-For the full terms, see the `LICENSE <https://github.com/terranovafr/C-CyberBattleSim/LICENSE>`_ file in the repository.
+For the full terms, see the `LICENSE <https://github.com/terranovafr/C-CyberBattleSim/blob/main/LICENSE>`_ file in the repository.
 
 
 Resources
