@@ -10,7 +10,7 @@ To support generalization, the agent's **observation and action spaces** are des
 Continuous Observation Space
 ----------------------------
 
-The agent's observation is the visible portion of the current scenario graph, as described in the Section `POMDP Formulation <pomdp.html>`_. This subgraph is encoded into a single graph-level embedding using the GAE Encoder introduced in the `World Model <world_model>`_.
+The agent's observation is the visible portion of the current scenario graph, as described in the Section `POMDP Formulation <pomdp.html>`_. This subgraph is encoded into a single graph-level embedding using the GAE Encoder introduced in the `Embedding Model <embedding_model>`_.
 
 Thus, at each timestep, the agent receives a vector :math:`\mathbf{h}_G \in \mathbb{R}^p`, where :math:`p` is the fixed dimensionality of the graph embeddings.
 

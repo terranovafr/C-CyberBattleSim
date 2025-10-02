@@ -53,6 +53,7 @@ Key parameters for the test command:
 
 Additional settings (e.g., number of episodes, steps per episode, logging level) are configurable via ``cyberbattle/agent/config/test_config.yaml``.
 
+
 Testing Output
 -----------------------------
 
@@ -71,3 +72,13 @@ Each run's subfolder will include metrics and output files based on the selected
     │         └── ......
 
 
+Agent Visualization
+-----------------------------
+
+Equivalent options used for the script ``test_agent.py`` can be used for the script ``visualize_agent.py`` to visualize agent testing behavior in a graphical interface.
+A dash application is launched, allowing interactive exploration of the agent's actions and decisions within the environment.
+
+.. image:: images/visualization.png
+    :width: 800px
+    :align: center
+    :alt: Visualization dash tool

@@ -32,7 +32,7 @@ The main advancements are the following:
 
 1. **Automated Scenario Generation**: Utilizes data from Shodan and the NVD to extract real-world service distributions and vulnerabilities, generating diverse synthetic scenarios through domain randomization with configurable parameters.
 2. **Game Reformulation**: Enhances the attack environment modeling by reformulating it as a POMDP by incorporating richer features and transitions.
-3. **World Model Learning**: Employs Graph Neural Networks and Language Models to encode graph structures and vulnerability information into continuous latent embedding spaces.
+3. **Embedding Model Learning**: Employs Graph Neural Networks and Language Models to encode graph structures and vulnerability information into continuous latent embedding spaces.
 4. **Invariant Agent Architecture**: Redesigns observation and action spaces using the learned latent representations to ensure independence from specific topologies or vulnerability sets, enabling more scalable and generalizable RL agents.
 
 The rest of this README offers a quick overview of usage. For complete details and in-depth information, please refer to the [official documentation](https://c-cyberbattlesim.readthedocs.io/en/latest/index.html).
@@ -78,12 +78,9 @@ The default files will include a default environment database, a default set of 
 ## Environment Database Regeneration
 You can either use the default environment database downloaded with __init.sh__, follow the instructions in **REPRODUCIBILITY.md** to use the paper’s database, or scrape fresh data using the APIs following this section guidelines.
 If you want to regenerate scenarios, the simulator supports scraping real-world data from Shodan and the National Vulnerability Database (NVD).
-```bash
-cd cyberbattle/data_generation
-```
 To scrape data, run:
 ```bash
-python3 scrape_data.py \ 
+python3 cyberbattle/data_generation/scrape_data.py \
         -q "has_vuln:True" \
         -np NUM_SERVICES \
         -nv NUM_SERVICE_VERSIONS \
@@ -104,10 +101,7 @@ This path will be used as the default environment database for scenario generati
 ## Scenario Generation
 Generate scenario environments based on the environment database with the following commands:
 ```bash
-cd cyberbattle/env_generation
-```
-```bash
-python3 generate_graphs.py \
+python3 cyberbattle/env_generation/generate_graphs.py \
         -p {random, mixed_equally, iot, ...} \
         --num_graphs NUM --name GRAPHS_SET_NAME \
         -train TRAIN_SIZE_SPLIT -val VAL_SIZE_SPLIT \
@@ -124,18 +118,14 @@ default_environments_path: logs_generated_scenarios
 ```
 ## GAE Training
 This repository includes a script to train a GAE on the generated scenarios using unsupervised learning. The GAE learns to create meaningful node embeddings used to construct the continuous spaces following the methodology described in the paper.
-Navigate to the training directory:
-```bash
-cd cyberbattle/gae
-```
 The files `config/train_config.yaml` contain parameters related to the GAE training process.
 To train the GAE using unsupervised learning, you can use the following command:
 ```bash
-python3 train_gae.py [--name NAME] \ 
+python3 cyberbattle/gae/train_gae.py [--name NAME] \
         [--holdout] \
         [--num_runs NUM_RUNS] \
         [-nlp LM_LIST] \
-        [--static_seed] 
+        [--static_seed]
 ```
 The trained model and related logs will be saved in the logs folder.
 The `hyperopt_gae.py` can be used with the same logic for performing hyper-parameters optimization.
@@ -147,9 +137,8 @@ This path will be used as the default GAE model for downstream tasks.
 
 ## DRL Agents
 
-After generating scenarios, the Deep Reinforcement Learning (DRL) agent can be trained within the C-CyberBattleSim environment scenarios using a world model composed of the GAE and LMs for building the continuous spaces. The agent learns to optimize vulnerability path discovery with the objective of achieving specified goals.
+After generating scenarios, the Deep Reinforcement Learning (DRL) agent can be trained within the C-CyberBattleSim environment scenarios using an embedding model composed of the GAE and LMs for building the continuous spaces. The agent learns to optimize vulnerability path discovery with the objective of achieving specified goals.
 Navigate to the agents directory:
-
 ```bash
 cd cyberbattle/agents
 ```
@@ -180,16 +169,28 @@ Moreover, a sampling process can be performed using the `sample_agent.py` script
 Trained models can be evaluated on test scenarios using:
 ```bash
 python3 test_agent.py --logs_folder AGENT_LOGS_FOLDER \
-        [--load_custom_test_envs TEST_ENVS] \ 
-        [--load_default_test_envs] \ 
+        [--load_custom_test_envs TEST_ENVS] \
+        [--load_default_test_envs] \
         [--last_checkpoint]  [--val_checkpoints] \
-        --option {'action_distribution', 'agent_performances', ....} \ 
+        --option {'action_distribution', 'agent_performances', ....} \
         [--static_seed]
 ```
 The test configurations are stored in the `config/test_config.yaml` file.
 Test results, including trajectories, average scores, and action distribution analyses, will be saved in the _test_ subfolder inside the specified logs folder.
 Testing can be performed on the best or all checkpoints, across training, validation, and various scenario sets.
 
+### Visualize the agent
+Trained agents can be visualized to better understand their behavior and decision-making.  
+Visualization can replay trajectories and highlight chosen actions, and show the impact of the agent on the environment.
+
+```bash
+python3 visualize_agent.py --logs_folder AGENT_LOGS_FOLDER \
+        [--load_custom_test_envs TEST_ENVS] \
+        [--load_default_test_envs] \
+        [--last_checkpoint]  [--val_checkpoints] \
+        [--static_seed]
+```
+![Example](docs/source/images/visualization.png)  
 ## Additional Utilities
 
 This repository includes several utility scripts for advanced functionality such as plot generation or the evaluation of heuristics as alternative to the DRL agents.

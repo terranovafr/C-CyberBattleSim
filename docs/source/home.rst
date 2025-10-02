@@ -24,9 +24,9 @@ This repository builds upon the CyberBattleSim framework by introducing a modula
    - Models the attack environment as a **Partially Observable Markov Decision Process** (POMDP) [8]_, allowing more realistic and effective learning.
    - 📄 Docs: `POMDP Formulation <pomdp.html>`_
 
-**3. World Model Learning**
+**3. Embedding Model Learning**
    - Uses Graph AutoEncoders and Language Models (from HuggingFace [6]_) to embed graph and vulnerability information into latent continuous spaces.
-   - 📄 Docs: `World Model <world_model.html>`_
+   - 📄 Docs: `Embedding Model <embedding_model.html>`_
 
 **4. Invariant Agent Architecture**
    - Defines observation and action spaces that are independent of specific graph topologies or vulnerability sets by leveraging the previously described latent representations. This framework supports the training of DRL algorithms using Stable-Baselines3 implementations [5]_, and enables direct comparison with the global and local space formulations introduced in prior work [7]_.
@@ -66,16 +66,23 @@ Use the following BibTeX entry to cite this project:
 
 .. code-block:: bibtex
 
-    @article{your_citation_key,
-      title={C-CyberBattleSim: ...},
-      author={Author 1 and Author 2 and Author 3},
-      journal={Journal Name},
-      year={Year},
-      volume={Volume},
-      number={Number},
-      pages={Pages},
-      publisher={Publisher}
+    @inproceedings{terranova2025scalable,
+      author    = {Terranova, Franco and Lahmadi, Abdelkader and Chrisment, Isabelle},
+      title     = {Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces},
+      booktitle = {28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2025)},
+      year      = {2025},
+      month     = {Oct},
+      address   = {Gold Coast, Australia},
+      pages     = {18},
     }
+
+
+License
+-----------------------------
+
+This project is released under the **MIT License**, a permissive open-source license that allows free use, modification, and distribution of the code, provided that the original copyright and license notice are included in all copies or substantial portions of the software.
+For the full terms, see the `LICENSE <https://github.com/terranovafr/C-CyberBattleSim/LICENSE>`_ file in the repository.
+
 
 Resources
 -----------------------------

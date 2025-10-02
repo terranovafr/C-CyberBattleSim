@@ -55,7 +55,7 @@ def wrap_graphs_to_local_envs(nets, logger, **kwargs):
         cyber_env = cyberbattle_env_local.CyberBattleLocalEnv(initial_environment=nets, logger=logger, **kwargs)
         return cyber_env
 
-# Wrap 1 or more graphs to the environment using world model environment
+# Wrap 1 or more graphs to the environment using continuous environment
 def wrap_graphs_to_gae_envs(nets, **kwargs):
     if isinstance(nets, list):
         envs = []

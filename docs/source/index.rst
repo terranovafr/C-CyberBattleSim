@@ -8,7 +8,7 @@
    data_scraping
    scenario_generation
    pomdp
-   world_model
+   embedding_model
    drl_agents
    train_agent
    test_agent

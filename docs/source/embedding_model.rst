@@ -1,9 +1,9 @@
-World Model
+Embedding Model
 ===========
 
-To train generalizable agents, the main environment elements — nodes, graphs, and vulnerabilities — are encoded into fixed-dimensional, semantically meaningful embeddings using a world model.
+To train generalizable agents, the main environment elements — nodes, graphs, and vulnerabilities — are encoded into fixed-dimensional, semantically meaningful embeddings using an embedding (static world model).
 This process is critical to ensure that the agent can generalize across different scenario graphs by leveraging a semantically meaningful embedding space, while avoiding dependencies on the size and ordering of elements through fixed-dimensional embeddings.
-The world model consists mainly of two components:
+The embedding model consists mainly of two components:
 
 - A **Graph Neural Network-based Autoencoder** (GAE) for graphs and nodes.
 - **Natural Language Processing (NLP)** (in particular **Language Models**) extractors to represent textual information as meaningful embeddings, and in particular vulnerabilities.
@@ -16,7 +16,7 @@ Graph and node embeddings are generated using a GAE comprising Graph Neural Netw
 To ensure semantic understanding of the graph structure, the GNN is pre-trained using unsupervised learning and then frozen for embedding generation.
 
 The GAE architecture consists of a GNN-based *Encoder* followed by a simple feed-forward Neural Network *Decoder*.
-At each time snapshot, the currently discovered scenario is represented as an evolving visible graph (see Section `POMDP Formulation <#pomdp-formulation>`_), which serves as input to the agent and hence should be transformed by the world model into a proper representation.
+At each time snapshot, the currently discovered scenario is represented as an evolving visible graph (see Section `POMDP Formulation <#pomdp-formulation>`_), which serves as input to the agent and hence should be transformed by the embedding model into a proper representation.
 
 Reconstruction Loss Function
 ~~~~~~~~~~~~
