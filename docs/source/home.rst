@@ -66,14 +66,15 @@ Use the following BibTeX entry to cite this project:
 
 .. code-block:: bibtex
 
-    @inproceedings{terranova2025scalable,
-      author    = {Terranova, Franco and Lahmadi, Abdelkader and Chrisment, Isabelle},
-      title     = {Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces},
-      booktitle = {28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2025)},
-      year      = {2025},
-      month     = {Oct},
-      address   = {Gold Coast, Australia},
-      pages     = {18},
+    @INPROCEEDINGS{terranova2025rlAttackPath,
+      author={Terranova, Franco and Lahmadi, Abdelkader and Chrisment, Isabelle},
+      booktitle={2025 28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID)},
+      title={Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces},
+      year={2025},
+      volume={},
+      number={},
+      pages={440-457},
+      doi={10.1109/RAID67961.2025.00029}
     }
 
 

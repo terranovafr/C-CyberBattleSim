@@ -20,9 +20,7 @@ This repository contains a modification of [Microsoft CyberBattleSim](https://gi
 of automated agents operating within simulated network environment scenarios for the prediction of attack paths.
 
 
-This project implements the advancements and extensions described in the paper:
-> ##### 📄 Paper Reference
-> Franco Terranova, Abdelkader Lahmadi, Isabelle Chrisment. Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces. _The 28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2025)_.
+This project implements the advancements and extensions described in the paper <a href="https://ieeexplore.ieee.org/document/11352493">"Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces"</a>.
 
 <p align="center">
 <img src="docs/source/images/home.png" alt="C-CyberBattleSim Overview" width="500"/>
@@ -197,6 +195,22 @@ This repository includes several utility scripts for advanced functionality such
 Refer to the documentation for usage instructions and detailed explanations of each utility.
 
 ---
+
+## Bibliographic Reference
+If you use this code in your research, please cite the following paper:
+
+```bibtex
+@INPROCEEDINGS{terranova2025rlAttackPath,
+  author={Terranova, Franco and Lahmadi, Abdelkader and Chrisment, Isabelle},
+  booktitle={2025 28th International Symposium on Research in Attacks, Intrusions and Defenses (RAID)}, 
+  title={Scalable and Generalizable RL Agents for Attack Path Discovery via Continuous Invariant Spaces}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={440-457},
+  doi={10.1109/RAID67961.2025.00029}
+}
+```
 
 ## Related repositories
 This simulator can reproduce the results presented in the paper using the same data and configurations.
