@@ -7,10 +7,11 @@
 [![BIL](https://img.shields.io/badge/BIL-Base%20Information%20Logiciel-purple?logo=information&logoColor=white)](https://bil.inria.fr/fr/software/view/5506/tab)
 [![CyberBattleSim](https://img.shields.io/badge/CyberBattleSim-Microsoft-red?logo=information&logoColor=white)](https://github.com/microsoft/CyberBattleSim)
 [![Zenodo](https://img.shields.io/badge/Zenodo-Data%20Repository-lightblue?logo=information&logoColor=white)](https://doi.org/10.5281/zenodo.14604651)
+[![Black Hat](https://img.shields.io/badge/Black%20Hat-Asia%202026-red?logo=information&logoColor=white)](https://blackhat.com/asia-26/arsenal/schedule/#continuous-cyberbattlesim-a-more-realistic-simulation-for-ai-driven-attack-path-discovery-49908)
 
 <div align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Logo_Universit%C3%A9_de_Lorraine.svg/1280px-Logo_Universit%C3%A9_de_Lorraine.svg.png" alt="Universite de Lorraine" height="50"/>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Inr_logo_rouge.svg/512px-Inr_logo_rouge.svg.png" alt="INRIA" height="50"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Inr_logo_rouge.svg/1280px-Inr_logo_rouge.svg.png" alt="INRIA" height="50"/>
   <img src="https://upload.wikimedia.org/wikipedia/fr/6/6e/Logo_loria_abrege_couleur.png" alt="LORIA" height="70"/>
   <img src="https://www.pepr-cybersecurite.fr/wp-content/uploads/2023/09/pep-cybersecurite-550x250-1.png" alt="SuperViZ" height="70"/>
 </div>
